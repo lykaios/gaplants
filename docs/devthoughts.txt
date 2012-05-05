@@ -1,0 +1,30 @@
+
+Days:
+Represent as a vector<ints>. 12 months x 30 days. access like days[month * 30 + day_offset]. The "int" it is storing is
+the amount of rain on that day. 0 is sunshine.
+
+Plant:
+  grow_time int //how many days it must grow
+  rain_amt int //how many inches of rain it needs
+  sun_days int //how many days of sun it needs
+
+Chromosome (Farm):
+  Associates each day with a Plant
+  -array of ints.  index is day, value is plant id
+   :same as above, but reverse?
+  -map. day is index, value is Plant * 
+  
+  What about the idea that we don't get a set list of plants, but a list of possibilities.  Then each farm can just be 
+  the radomly assigned plants.  That would simplify cross over, mutation 
+
+Fitness function:
+  For each plant, need to check and see if it survived the growing cycle. 
+  loop on days
+	sum_rain = cur_day_rain + sum_rain
+	if(cur_day_rain = 0)
+	  sum_sun = sum_sun + 1
+  If plant doesn't survive 0 score, or fractional (rain_actual/ rain_needed + sun_actual/sun_needed)?
+  Each chromosome's fitness is then the sum of it's plants fitness. 
+
+Selection:
+  Rouletted wheel - higher fitness will be higher likelyhood of advancement to next generation

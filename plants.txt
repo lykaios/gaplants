@@ -1,0 +1,2 @@
+Orange 20 10 5
+Strawberry 15 5 3

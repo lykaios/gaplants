@@ -1,0 +1,16 @@
+#!/bin/bash
+out='output'
+plants='plants.txt'
+logfile='timelog'
+main='gafarm'
+threads=1
+#delete old executable
+rm $main $out
+#compile program
+#g++ -fopenmp -o $main gauss_elim.cpp lse.cpp
+g++ -fopenmp -o $main main.cpp plant.cpp 
+#execute program, pipe output
+for i in {1..1}
+do
+./$main $threads $i $logfile $plants  > $out 
+done
