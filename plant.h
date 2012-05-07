@@ -9,6 +9,7 @@ class Plant
   public:
 	Plant(string name_in, int grow_period, int rain_in, int sun_days);
 	void print();
+	string ret_abrv_name();
   
   private:
 	string name;

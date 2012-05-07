@@ -3,7 +3,7 @@ Overview
 Problem:
 How do farmers maximize their crop yield over a given season?  The idea is to have a calendar of 12 months of 30 days,
 where each day can have 0-x inches of rain.  0 would be considered a "sunny" day, and anything else would be that amount
-of rain.  At the beginning of a season, a farmer is assigned a series/number of different crops (10 tomatoes, 12 apricots, etc)
+of rain.  At the beginning of a season, a farmer is assigned a list of different crops (tomatoes, potatoes, apricots, etc)
 which require different amounts of sun/rain over a given growing period.  Using Genetic Algorithms, we will have a chromosone
 population which will represent the different days you could plant a given farm, and how successful that farm is. (Based on
 the amount of crops that make it to "yield" point.)

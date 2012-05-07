@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <omp.h>
 #include "plant.h"
 using namespace std;
@@ -18,4 +19,9 @@ void Plant::print()
   cout << "-rain: " << rain_amount << endl;
   cout << "-sun: " << sun_days << endl;
   cout << "-grow: " << grow_period << endl;
+}
+
+string Plant::ret_abrv_name()
+{
+  return name.substr(0,4);
 }

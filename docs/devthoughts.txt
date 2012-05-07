@@ -10,12 +10,7 @@ Plant:
 
 Chromosome (Farm):
   Associates each day with a Plant
-  -array of ints.  index is day, value is plant id
-   :same as above, but reverse?
-  -map. day is index, value is Plant * 
-  
-  What about the idea that we don't get a set list of plants, but a list of possibilities.  Then each farm can just be 
-  the radomly assigned plants.  That would simplify cross over, mutation 
+  -Vector of Plant*. Index is day it is planted, Plant* is the plant type
 
 Fitness function:
   For each plant, need to check and see if it survived the growing cycle. 
