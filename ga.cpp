@@ -17,12 +17,13 @@ Ga::Ga(vector<Plant*> plants_in)
   plant_list = plants_in;
   init_chromos();
 }
-
+//Fill our calendar with integer values, representing amount of rain
 void Ga::init_calendar()
 {
   for(int i = 0; i < calendar_days; i++)
 	calendar.push_back(rand() % 10); 
 }
+//Fill each memeber of population with randomly selected plant growing days.
 void Ga::init_chromos()
 {
   int plant_indx = 0;
@@ -38,7 +39,7 @@ void Ga::init_chromos()
 	chromos.push_back(plant_builder);	
   }
 }
-
+//Print out current class info
 void Ga::print()
 {
   int row_size = 20;
@@ -68,7 +69,7 @@ void Ga::print()
   }
 
 }
-
+//Fetch a random plant pointer from our list. 
 Plant * Ga::ret_rand_plant()
 {
   Plant * ret_plant = NULL;
