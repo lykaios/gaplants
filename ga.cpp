@@ -5,15 +5,18 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <vector>
+#include <queue>
 #include "ga.h"
 using namespace std;
 
 Ga::Ga(vector<Plant*> plants_in)
 {
-  pop_size = 8;
+  pop_size = 10;
   //12 months, 30 days
   calendar_days = 360;
   cur_gen = 0;
+  cross_rate = .2;
+  elite_pct = .2;
   init_calendar(); 
   plant_list = plants_in;
   init_chromos();
@@ -90,7 +93,38 @@ void Ga::eval_fitness()
     fitness.push_back(local_fitness);   
   } 
 }
+//Used to advance onto next generation
+//:selects the elect members
+//:crosses their genes to produce new population
+//:introduces new members to keep new blood (or should this be mutations?)
+void Ga::advance_generation()
+{
+  /*TODO: Really need to work on the algorithm/data structure which is going
+  to hold the elite members.  We need to store the index to the chromosome, 
+  and the fitness value of it. We then need to ensure it is some how sorted,
+  so we only access a subset (elite members) of the population.
+  */
 
+  priority_queue<int, vector<int> > fit_members;
+  vector<int> tmp;
+  //Print out current fitness of generation
+  for(int c = 0; c < fitness.size(); c++)
+    cout << "member" << c << " = " << fitness[c] << endl;
+
+  for(int j = 0; j < pop_size; j++)
+  {
+    tmp.push_back(j);
+    fit_members.push(fitness[cur_gen * pop_size + j] , tmp); 
+    tmp.clear();  
+  }
+  
+  while(!fit_members.empty())
+  {
+    //cout << fit_members.top()->c_fitness << "@" << fit_members.top()->c_index << endl;
+    cout << fit_members.top() << endl; 
+    fit_members.pop();
+  }
+}
 int Ga::chrom_fitness(int chrom_index)
 {
   int sun_sum, rain_sum;
