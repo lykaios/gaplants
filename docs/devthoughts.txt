@@ -25,3 +25,14 @@ Fitness function:
 
 Selection:
   Rouletted wheel - higher fitness will be higher likelyhood of advancement to next generation
+
+======
+Files:
+
+plants.txt - list of plants to read in. name, grow, rain, sun. should be seperated by whitespace. Note: the longer the grow period, the better chance of meeting the rain/sun requirements, and higher fitness levels of chromosomes.
+
+plant.* - plant class.
+
+ga.* - genetic algorithm class. 
+
+main.cpp - runs the simulation.

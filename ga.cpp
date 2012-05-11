@@ -10,9 +10,10 @@ using namespace std;
 
 Ga::Ga(vector<Plant*> plants_in)
 {
-  pop_size = 4;
+  pop_size = 8;
   //12 months, 30 days
   calendar_days = 360;
+  cur_gen = 0;
   init_calendar(); 
   plant_list = plants_in;
   init_chromos();
@@ -21,7 +22,7 @@ Ga::Ga(vector<Plant*> plants_in)
 void Ga::init_calendar()
 {
   for(int i = 0; i < calendar_days; i++)
-	calendar.push_back(rand() % 10); 
+	calendar.push_back(rand() % 4); 
 }
 //Fill each memeber of population with randomly selected plant growing days.
 void Ga::init_chromos()
@@ -76,4 +77,40 @@ Plant * Ga::ret_rand_plant()
   int tmp = plant_list.size();
   ret_plant = plant_list[rand() % tmp];
   return ret_plant;
+}
+
+void Ga::eval_fitness()
+{
+  int local_fitness = 0;
+  //For each chromosone
+  for(int i = 0; i < pop_size; i++)
+  {
+    local_fitness = chrom_fitness(i);
+    //cout << "chromo(" << i << ") fitness = " << local_fitness << endl;
+    fitness.push_back(local_fitness);   
+  } 
+}
+
+int Ga::chrom_fitness(int chrom_index)
+{
+  int sun_sum, rain_sum;
+  int fitness = 0;
+  //For each day chopping off last 50 days for simplicity for now
+  for(int i = 0; i < calendar_days - 50; i++)
+  {
+    sun_sum = 0;
+    rain_sum = 0;
+    //Loop through grow cycle, sum rain amount and sunny days
+    for(int j = i; j < chromos[chrom_index][i]->ret_grow_period(); j++)
+    {
+      if (calendar[j] == 0)
+	sun_sum += 1;
+      else
+	rain_sum += calendar[j];
+    } 
+    //If the grow period met plants requirements, increment fitness of this chromosone
+    if (rain_sum >= chromos[chrom_index][i]->ret_rain_amt() && sun_sum >=  chromos[chrom_index][i]->ret_sun_days() )
+      fitness += 1; 
+  }   
+  return fitness;
 }

@@ -25,3 +25,6 @@ string Plant::ret_abrv_name()
 {
   return name.substr(0,4);
 }
+int Plant::ret_rain_amt() {return rain_amount;};
+int Plant::ret_sun_days() {return sun_days;};
+int Plant::ret_grow_period(){return grow_period;};  
