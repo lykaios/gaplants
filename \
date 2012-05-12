@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <vector>
-#include <queue>
 #include "ga.h"
 using namespace std;
 
@@ -16,7 +15,7 @@ Ga::Ga(vector<Plant*> plants_in)
   calendar_days = 360;
   cur_gen = 0;
   cross_rate = .2;
-  elite_pct = .5;
+  elite_pct = .2;
   init_calendar(); 
   plant_list = plants_in;
   init_chromos();
@@ -99,41 +98,31 @@ void Ga::eval_fitness()
 //:introduces new members to keep new blood (or should this be mutations?)
 void Ga::advance_generation()
 {
-  //Still need to rework this.
   vector<pair <int, int> > fit_members;
   //Print out current fitness of generation
   for(int c = 0; c < fitness.size(); c++)
     cout << "member" << c << " = " << fitness[c] << endl;
   //Initialize with false values, but doing it to preserve size
   for(int x = 0; x < pop_size * elite_pct; x++)
-    fit_members.push_back(make_pair(-1, -1));
+    fit_members.push_back((-1, -1));
   for(int j = 0; j < pop_size; j++)
   {
     //fit_members.push(fitness[cur_gen * pop_size + j]); 
     for(int k = 0; k < fit_members.size(); k++)
     {
-      if(fitness[cur_gen * pop_size + j] > fit_members[k].second && k != fit_members[k].first)
+      if(fitness[cur_gen * pop_size + j] > fit_members[k].c_fitness)
       {
-	for(int y = fit_members.size() - 1; y > 0; y--)
-	{
-	  fit_members[y].first = fit_members[y-1].first;
-	  fit_members[y].second = fit_members[y-1].second;
-	}		 
-	fit_members[0].first = j;
-	fit_members[0].second = fitness[cur_gen * pop_size + j];
+	//call "move right"
       } 
     }
   }
-  for(int k = 0; k < fit_members.size(); k++)
-    cout << fit_members[k].first << " , " << fit_members[k].second << endl;
-  
 }
 
 //If we have found a higher value, move all values right. 
-/*void Ga::move_right(vector<Node *> &v_in, Node * to_add)
+void Ga::move_right(vector<Node *> &v_in, Node * to_add)
 {
 
-}*/
+}
 int Ga::chrom_fitness(int chrom_index)
 {
   int sun_sum, rain_sum;

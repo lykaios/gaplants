@@ -39,7 +39,7 @@ class Ga
 	class Node
 	{
 	    public:
-	      Node(int fit_in, int index_in) {c_fitness = fit_in; c_index = index_in;};
+	      Node(int index_in, int fit_in) {c_fitness = fit_in; c_index = index_in;};
 	    int c_fitness;
 	    int c_index;  
 	};
