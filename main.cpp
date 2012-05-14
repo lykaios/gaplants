@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
   Ga * my_ga = new Ga(plant_list); 
   //my_ga->print();
   my_ga->eval_fitness();
-  //my_ga->advance_generation();
+  my_ga->advance_generation();
  
  
   //Print time and call verification step

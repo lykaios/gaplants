@@ -18,6 +18,10 @@ class Ga
 	void init_chromos();	
 	Plant *ret_rand_plant();
 	int chrom_fitness(int chrom_index);
+	void insert_elite(vector<pair <int,int> > &fit_members, int fitness, int member_index, int target_index);
+	void breed_population(vector<pair <int,int> > fit_members);
+	void roulette_selection(int parent1, int parent2);
+
 	//Store "farms" as a vector of plant pointers
 	vector< vector<Plant*> > chromos;
 	//List of available plants
@@ -36,12 +40,15 @@ class Ga
 	vector<int> fitness;
 	//Current generation we are on. This way we can reference prior generations fitness
 	int cur_gen;
+	/*
 	class Node
 	{
 	    public:
 	      Node(int index_in, int fit_in) {c_fitness = fit_in; c_index = index_in;};
 	    int c_fitness;
 	    int c_index;  
+  
 	};
+	*/
 };
 #endif

@@ -26,6 +26,8 @@ Fitness function:
 Selection:
   Rouletted wheel - higher fitness will be higher likelyhood of advancement to next generation
 
+Crossover:
+  One point - Select a random point on parent X. From 0 -> random point use parent X's genes, then the rest is parent Y's.
 ======
 Files:
 
