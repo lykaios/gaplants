@@ -13,3 +13,5 @@ for i in {1..1}
 do
 ./$main $threads $i $logfile $plants  > $out 
 done
+
+more output

@@ -20,7 +20,8 @@ class Ga
 	int chrom_fitness(int chrom_index);
 	void insert_elite(vector<pair <int,int> > &fit_members, int fitness, int member_index, int target_index);
 	void breed_population(vector<pair <int,int> > fit_members);
-	void roulette_selection(int parent1, int parent2);
+	int roulette_selection(vector<double> fit_pct);
+	void init_randoms();
 
 	//Store "farms" as a vector of plant pointers
 	vector< vector<Plant*> > chromos;

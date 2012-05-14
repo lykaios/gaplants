@@ -21,6 +21,7 @@ Ga::Ga(vector<Plant*> plants_in)
   init_calendar(); 
   plant_list = plants_in;
   init_chromos();
+  init_randoms();
 }
 //Fill our calendar with integer values, representing amount of rain
 void Ga::init_calendar()
@@ -43,6 +44,13 @@ void Ga::init_chromos()
 	}
 	chromos.push_back(plant_builder);	
   }
+}
+void Ga::init_randoms()
+{
+  int i1,i2;
+  i1 = rand() % 112312;
+  i2 = rand() % 912312;
+  srand48(i1 % i2);
 }
 //Print out current class info
 void Ga::print()
@@ -165,6 +173,25 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
   //Implement crossover, them mutation
   int members_to_create = pop_size - (pop_size * elite_pct);// - (pop_size * mutation_pct);
   int par1, par2;
+  double tot_gen_fitness = 0;
+  vector <double> member_fit_pct;
+  double cache = 0.0;
+  double fit;
+  //Sum the total generations fitness
+  for(int i = 0; i < pop_size; i++)
+    tot_gen_fitness += fitness[cur_gen * pop_size + i];
+  
+  //Calculate the pct of each members fitness
+  for(int i = 0; i < pop_size; i++)
+  {
+    //TODO: Make this one statement
+    fit = fitness[cur_gen*pop_size+ i];
+    cache = fit / tot_gen_fitness;
+    member_fit_pct.push_back(cache); 
+  }
+  //Print out
+  for(int i = 0; i < member_fit_pct.size(); i++)
+     cout << "fit pct @" << i << " = " << member_fit_pct[i] << endl;
   /*
   int plant_indx = 0;
   vector <Plant*> plant_builder;
@@ -186,35 +213,35 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
 	chromos.push_back(plant_builder);	
   }
   */
-  roulette_selection(par1, par2);
+  parent1 = roulette_selection(member_fit_pct);
+  parent2 = roulette_selection(member_fit_pct);
 }
 
-void Ga::roulette_selection(int parent1, int parent2)
+int Ga::roulette_selection(vector<double> fit_pct)
 {
-  int tot_gen_fitness = 0;
-  vector <double> member_fit_pct;
-  double cache = 0.0;
-  //Sum the total generations fitness
-  for(int i = 0; i < pop_size -1; i++)
-    tot_gen_fitness += fitness[cur_gen * pop_size + i];
-  
-  //Calculate the pct of each members fitness
-  for(int i = 0; i < pop_size -1; i++)
-  {
-    cout << fitness[cur_gen*pop_size+ i] << "/" << tot_gen_fitness;
-    cache = fitness[cur_gen*pop_size + i] / tot_gen_fitness;
-    cout << " = " << cache << endl;
-    member_fit_pct.push_back(cache); 
-  }
+  init_randoms();
+  //Select random double
+  double rand_select = drand48();
+  bool wcontinue = true;
+  double cur_sum = 0.0;
+  int i;
 
-  for(int i = 0; i < member_fit_pct.size(); i++)
-     cout << "fit pct @" << i << " = " << member_fit_pct[i] << endl;
+  cout << "Generated rand = " << rand_select << endl;
+  for(i = 0; i < fit_pct.size() - 1; i++)
+  { 
+    cur_sum += fit_pct[i];
+    //cout << "run" << i << " sum = " << cur_sum << endl;
+    if(rand_select > cur_sum && rand_select < (cur_sum + fit_pct[i+1]) )
+      break;
+  }
+  return i; 
 }
 int Ga::chrom_fitness(int chrom_index)
 {
   int sun_sum, rain_sum;
   int fitness = 0;
   //For each day chopping off last 50 days for simplicity for now
+  //TODO: Fix so that it gets lowest grow period from plant list
   for(int i = 0; i < calendar_days - 50; i++)
   {
     sun_sum = 0;
