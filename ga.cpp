@@ -11,13 +11,13 @@ using namespace std;
 
 Ga::Ga(vector<Plant*> plants_in)
 {
-  pop_size = 10;
+  pop_size = 30;
   //TODO: Only for dev, increase day size for real tests
   //12 months, 30 days
-  calendar_days = 100;
+  calendar_days = 360;
   cur_gen = 0;
   cross_rate = .2;
-  elite_pct = 1.0;
+  elite_pct = .2;
   //mutation_pct = .1;
   init_calendar(); 
   plant_list = plants_in;
@@ -105,6 +105,8 @@ void Ga::print_fitness()
     cout << fitness[i] << "|";
   }
 }
+
+//Print a single chromosome
 void Ga::print_chromosome(vector<Plant *> chromo_to_print, int row_size)
 {
   for(int j = 0; j < chromo_to_print.size(); j++)
@@ -170,14 +172,14 @@ void Ga::advance_generation()
   }
   
   //Print out elite members
-  cout << "gen " << cur_gen << " elite chromos" << endl;
+  /*cout << "gen " << cur_gen << " elite chromos" << endl;
   for(int k = 0; k < fit_members.size(); k++)
     cout << "chromo" << fit_members[k].first << "|fit=" << fit_members[k].second << endl;
-
+  */
   //Push elite members into new population 
   for(int k = 0; k < fit_members.size(); k++)
   {
-    cout << "DEBUG: Pushing elite member " << k << "(" << cur_gen << "*" << pop_size << "+" << fit_members[k].first << ")\n";  
+    //cout << "DEBUG: Pushing elite member " << k << "(" << cur_gen << "*" << pop_size << "+" << fit_members[k].first << ")\n";  
     //cout << " : of size " << chromos[cur_gen * pop_size + fit_members[k].first].size() << endl;
     push_member = chromos[cur_gen * pop_size + fit_members[k].first];
     chromos.push_back(push_member);  
@@ -229,10 +231,10 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
   //Print out
   //for(int i = 0; i < member_fit_pct.size(); i++)
   //   cout << "fit pct @" << i << " = " << member_fit_pct[i] << endl;
-  cout << "DEBUG: members needed to breed = " << members_to_create << endl;  
+  //cout << "DEBUG: members needed to breed = " << members_to_create << endl;  
   //For all missing members of population, apply roulette wheel selection
   
-  /*for(int i = 0; i < members_to_create; i++)
+  for(int i = 0; i < members_to_create; i++)
   {
     //Select both parents
     parent1 = roulette_selection(member_fit_pct);
@@ -245,7 +247,7 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
     //Push new member into population 
     chromos.push_back(new_member); 
   } 
-  */
+  
 }
 
 //Get random number to be crossover point
@@ -286,7 +288,7 @@ int Ga::chrom_fitness(int chrom_index)
     sun_sum = 0;
     rain_sum = 0;
     //Loop through grow cycle, sum rain amount and sunny days
-    for(int j = i; j < chromos[cur_gen * chrom_index][i]->ret_grow_period(); j++)
+    for(int j = i; j < chromos[cur_gen * pop_size + chrom_index][i]->ret_grow_period(); j++)
     {
       if (calendar[j] == 0)
 	sun_sum += 1;
@@ -294,7 +296,7 @@ int Ga::chrom_fitness(int chrom_index)
 	rain_sum += calendar[j];
     } 
     //If the grow period met plants requirements, increment fitness of this chromosone
-    if (rain_sum >= chromos[cur_gen * chrom_index][i]->ret_rain_amt() && sun_sum >=  chromos[cur_gen * chrom_index][i]->ret_sun_days() )
+    if (rain_sum >= chromos[cur_gen * pop_size + chrom_index][i]->ret_rain_amt() && sun_sum >=  chromos[cur_gen * pop_size + chrom_index][i]->ret_sun_days() )
       fitness += 1; 
   }   
   return fitness;
