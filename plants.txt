@@ -1,5 +1,5 @@
-Orange 20 4 5
-Strawberry 25 5 3
+Orange 40 4 5
+Strawberry 35 5 3
 Cherry 40 20 5
 Banana 40 12 30
 Tomatoe 30 10 20

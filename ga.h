@@ -12,6 +12,7 @@ class Ga
 	Ga(vector<Plant*> plants_in);
 	void print();
 	void print_fitness();
+	void print_chromosome(vector<Plant *> chromo_to_print, int row_size);
 	void eval_fitness();
 	void advance_generation(); 
   private:

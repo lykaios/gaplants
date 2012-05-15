@@ -57,14 +57,15 @@ int main(int argc, char *argv[])
 	plant_list.push_back(new Plant(in_name, in_grow, in_rain, in_sun));
   }
   Ga * my_ga = new Ga(plant_list); 
-  //my_ga->print();
-  my_ga->eval_fitness();
-  my_ga->advance_generation();
   my_ga->print();
-  my_ga->eval_fitness();
+  //Simulate for x generations
+  for(int x = 0; x < 5; x++)
+  {
+    my_ga->advance_generation();
+  }
+  //Print out fitness, should be increasing over time
   my_ga->print_fitness();
- 
- 
+  my_ga->print(); 
   //Print time and call verification step
   //fout << "Time elapsed: " << difftime(end, begin) << " seconds where n = " << msize;
   //Close file

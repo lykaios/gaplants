@@ -12,11 +12,12 @@ using namespace std;
 Ga::Ga(vector<Plant*> plants_in)
 {
   pop_size = 10;
+  //TODO: Only for dev, increase day size for real tests
   //12 months, 30 days
-  calendar_days = 360;
+  calendar_days = 100;
   cur_gen = 0;
   cross_rate = .2;
-  elite_pct = .2;
+  elite_pct = 1.0;
   //mutation_pct = .1;
   init_calendar(); 
   plant_list = plants_in;
@@ -29,7 +30,7 @@ void Ga::init_calendar()
   for(int i = 0; i < calendar_days; i++)
 	calendar.push_back(rand() % 4); 
 }
-//Fill each memeber of population with randomly selected plant growing days.
+//Fill each member of population with randomly selected plant growing days.
 void Ga::init_chromos()
 {
   int plant_indx = 0;
@@ -45,6 +46,7 @@ void Ga::init_chromos()
 	chromos.push_back(plant_builder);	
   }
 }
+//Reinit pseudo random values because time-based won't work for rapid calls due to caching
 void Ga::init_randoms()
 {
   int i1,i2;
@@ -78,26 +80,42 @@ void Ga::print()
     cout << "=====Chromosones=====\n";
     for(int i = 0; i < pop_size ; i++)
     {
-	  cout << "Member" << i << "\n---------------";
-	  for(int j = 0; j < chromos[i].size(); j++)
-	  {
-	    if(j % row_size == 0)
-		  cout << endl << "row" << j/row_size << "|";
-	    cout << chromos[gen_cnt * i][j]->ret_abrv_name() << "|";
-	  }
-	  cout << endl;
+      cout << "Member" << i << "\n---------------";
+      print_chromosome(chromos[gen_cnt * pop_size + i], row_size);
     }
   };
 }
+//Print out fitness for each generation
 void Ga::print_fitness()
 {
+  int tot_gen_fit = 0;
+  int max_fit = 0;
+  //cout << "DEBUG: fitness.size = " << fitness.size() << endl;
   for(int i = 0; i < fitness.size(); i++)
   {
+    tot_gen_fit += fitness[i];
+    if(max_fit < fitness[i])
+      max_fit = fitness[i];
     if(i % pop_size == 0)
-      cout << endl << "gen" << i / pop_size << "|";
+    {  
+      cout << " Total Gen Fit = " << tot_gen_fit << ", Max fit = " << max_fit << endl << "gen" << i / pop_size << "|";
+      tot_gen_fit = 0;
+      max_fit = 0;
+    }
     cout << fitness[i] << "|";
   }
 }
+void Ga::print_chromosome(vector<Plant *> chromo_to_print, int row_size)
+{
+  for(int j = 0; j < chromo_to_print.size(); j++)
+  {
+    if(j % row_size == 0)
+	  cout << endl << "row" << j/row_size << "|";
+    cout << chromo_to_print[j]->ret_abrv_name() << "|";
+  }
+  cout << endl;
+}
+
 //Fetch a random plant pointer from our list. 
 Plant * Ga::ret_rand_plant()
 {
@@ -107,6 +125,7 @@ Plant * Ga::ret_rand_plant()
   return ret_plant;
 }
 
+//Evaluate fitness of population for current generation 
 void Ga::eval_fitness()
 {
   int local_fitness = 0;
@@ -117,33 +136,33 @@ void Ga::eval_fitness()
     fitness.push_back(local_fitness);   
   } 
 }
+
 //Used to advance onto next generation
 //:selects the elite members
 //:crosses their genes to produce new population
 //:introduces new members to keep new blood (or should this be mutations?)
 void Ga::advance_generation()
 {
-  //Still need to rework this.
+  vector<Plant * > push_member;
   vector<pair <int, int> > fit_members;
   bool chromo_in = false;
-  //Print out current fitness of generation
-  for(int c = 0; c < fitness.size(); c++)
-    cout << "member" << c << " = " << fitness[c] << endl;
+  //Evaluate fitness of current generation
+  eval_fitness();
   //Initialize with false values, but doing it to preserve size
   for(int x = 0; x < pop_size * elite_pct; x++)
     fit_members.push_back(make_pair(-1, -1));
- 
   //Obtain elite members 
   for(int j = 0; j < pop_size; j++)
   {
     for(int k = 0; k < fit_members.size(); k++)
     {
-      if(fitness[cur_gen * pop_size + j] > fit_members[k].second /*&& !chromo_in*/)
+      if(fitness[cur_gen * pop_size + j] > fit_members[k].second)
       {
 	//Insert chromo into elite list. 
 	insert_elite(fit_members,fitness[cur_gen * pop_size + j], j, k);		
 	chromo_in = true; 
-      } 
+      }
+      //If we have already inserted that member, exit our loop 
       if (chromo_in == true)
 	break;
     }
@@ -151,16 +170,22 @@ void Ga::advance_generation()
   }
   
   //Print out elite members
+  cout << "gen " << cur_gen << " elite chromos" << endl;
   for(int k = 0; k < fit_members.size(); k++)
-    cout << fit_members[k].first << " , " << fit_members[k].second << endl;
+    cout << "chromo" << fit_members[k].first << "|fit=" << fit_members[k].second << endl;
 
   //Push elite members into new population 
   for(int k = 0; k < fit_members.size(); k++)
-    chromos.push_back(chromos[cur_gen*pop_size + fit_members[k].first]);
+  {
+    cout << "DEBUG: Pushing elite member " << k << "(" << cur_gen << "*" << pop_size << "+" << fit_members[k].first << ")\n";  
+    //cout << " : of size " << chromos[cur_gen * pop_size + fit_members[k].first].size() << endl;
+    push_member = chromos[cur_gen * pop_size + fit_members[k].first];
+    chromos.push_back(push_member);  
+  }
   //Breed members
   breed_population(fit_members);
   
-  //Mutate remaining
+  //Mutate remaining?
 
   //Advance generation counter
   cur_gen++;
@@ -193,7 +218,6 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
   //Sum the total generations fitness
   for(int i = 0; i < pop_size; i++)
     tot_gen_fitness += fitness[cur_gen * pop_size + i];
-  
   //Calculate the pct of each members fitness
   for(int i = 0; i < pop_size; i++)
   {
@@ -203,11 +227,12 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
     member_fit_pct.push_back(cache); 
   }
   //Print out
-  for(int i = 0; i < member_fit_pct.size(); i++)
-     cout << "fit pct @" << i << " = " << member_fit_pct[i] << endl;
-  
+  //for(int i = 0; i < member_fit_pct.size(); i++)
+  //   cout << "fit pct @" << i << " = " << member_fit_pct[i] << endl;
+  cout << "DEBUG: members needed to breed = " << members_to_create << endl;  
   //For all missing members of population, apply roulette wheel selection
-  for(int i = 0; i < members_to_create; i++)
+  
+  /*for(int i = 0; i < members_to_create; i++)
   {
     //Select both parents
     parent1 = roulette_selection(member_fit_pct);
@@ -220,13 +245,17 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
     //Push new member into population 
     chromos.push_back(new_member); 
   } 
-
+  */
 }
+
+//Get random number to be crossover point
 int Ga::get_cross_point()
 {
   init_randoms();
   return rand() % calendar_days;
 }
+
+//Apply roulette_selection
 int Ga::roulette_selection(vector<double> fit_pct)
 {
   init_randoms();
@@ -236,7 +265,7 @@ int Ga::roulette_selection(vector<double> fit_pct)
   double cur_sum = 0.0;
   int i;
 
-  cout << "Generated rand = " << rand_select << endl;
+  //cout << "Generated rand = " << rand_select << endl;
   for(i = 0; i < fit_pct.size() - 1; i++)
   { 
     cur_sum += fit_pct[i];
