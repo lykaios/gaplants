@@ -60,6 +60,9 @@ int main(int argc, char *argv[])
   //my_ga->print();
   my_ga->eval_fitness();
   my_ga->advance_generation();
+  my_ga->print();
+  my_ga->eval_fitness();
+  my_ga->print_fitness();
  
  
   //Print time and call verification step

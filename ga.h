@@ -11,6 +11,7 @@ class Ga
   public:
 	Ga(vector<Plant*> plants_in);
 	void print();
+	void print_fitness();
 	void eval_fitness();
 	void advance_generation(); 
   private:
@@ -22,6 +23,7 @@ class Ga
 	void breed_population(vector<pair <int,int> > fit_members);
 	int roulette_selection(vector<double> fit_pct);
 	void init_randoms();
+	int get_cross_point();
 
 	//Store "farms" as a vector of plant pointers
 	vector< vector<Plant*> > chromos;
@@ -41,15 +43,5 @@ class Ga
 	vector<int> fitness;
 	//Current generation we are on. This way we can reference prior generations fitness
 	int cur_gen;
-	/*
-	class Node
-	{
-	    public:
-	      Node(int index_in, int fit_in) {c_fitness = fit_in; c_index = index_in;};
-	    int c_fitness;
-	    int c_index;  
-  
-	};
-	*/
 };
 #endif

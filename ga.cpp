@@ -56,37 +56,47 @@ void Ga::init_randoms()
 void Ga::print()
 {
   int row_size = 20;
-  
-  cout << "Generation: " << cur_gen << endl;
-  //If on first print, show our constant calendar/plant list
-  if(cur_gen == 0)
-  {
-    cout << "====Calendar====";
-    for(int i = 0; i < calendar.size(); i++)
-    {  
-	  if(i % row_size == 0)
-	    cout << endl << "row" << i/row_size << "|";
-	  cout << calendar[i] << "|";
-    }
-    cout << "\n====Plants====\n";
-    for(int i = 0; i < plant_list.size(); i++)
+  for(int gen_cnt = 0; gen_cnt <= cur_gen; gen_cnt++)
+  { 
+    cout << "Generation: " << gen_cnt << endl;
+    //If on first print, show our constant calendar/plant list
+    if(gen_cnt == 0)
     {
-	  plant_list[i]->print();
+      cout << "====Calendar====";
+      for(int i = 0; i < calendar.size(); i++)
+      {  
+	    if(i % row_size == 0)
+	      cout << endl << "row" << i/row_size << "|";
+	    cout << calendar[i] << "|";
+      }
+      cout << "\n====Plants====\n";
+      for(int i = 0; i < plant_list.size(); i++)
+      {
+	    plant_list[i]->print();
+      }
     }
-  }
-  cout << "=====Chromosones=====\n";
-  for(int i = 0; i < pop_size ; i++)
+    cout << "=====Chromosones=====\n";
+    for(int i = 0; i < pop_size ; i++)
+    {
+	  cout << "Member" << i << "\n---------------";
+	  for(int j = 0; j < chromos[i].size(); j++)
+	  {
+	    if(j % row_size == 0)
+		  cout << endl << "row" << j/row_size << "|";
+	    cout << chromos[gen_cnt * i][j]->ret_abrv_name() << "|";
+	  }
+	  cout << endl;
+    }
+  };
+}
+void Ga::print_fitness()
+{
+  for(int i = 0; i < fitness.size(); i++)
   {
-	cout << "Member" << i << "\n---------------";
-	for(int j = 0; j < chromos[i].size(); j++)
-	{
-	  if(j % row_size == 0)
-		cout << endl << "row" << j/row_size << "|";
-	  cout << chromos[i][j]->ret_abrv_name() << "|";
-	}
-	cout << endl;
+    if(i % pop_size == 0)
+      cout << endl << "gen" << i / pop_size << "|";
+    cout << fitness[i] << "|";
   }
-
 }
 //Fetch a random plant pointer from our list. 
 Plant * Ga::ret_rand_plant()
@@ -104,7 +114,6 @@ void Ga::eval_fitness()
   for(int i = 0; i < pop_size; i++)
   {
     local_fitness = chrom_fitness(i);
-    //cout << "chromo(" << i << ") fitness = " << local_fitness << endl;
     fitness.push_back(local_fitness);   
   } 
 }
@@ -145,13 +154,16 @@ void Ga::advance_generation()
   for(int k = 0; k < fit_members.size(); k++)
     cout << fit_members[k].first << " , " << fit_members[k].second << endl;
 
-  //Push elite members into new population, or do inside breeding function?
-  
+  //Push elite members into new population 
+  for(int k = 0; k < fit_members.size(); k++)
+    chromos.push_back(chromos[cur_gen*pop_size + fit_members[k].first]);
   //Breed members
   breed_population(fit_members);
+  
   //Mutate remaining
 
   //Advance generation counter
+  cur_gen++;
 }
 
 //Function used to insert into our elite member list
@@ -170,13 +182,14 @@ void Ga::insert_elite(vector<pair <int,int> > &fit_members, int fitness, int mem
 
 void Ga::breed_population(vector<pair <int,int> > fit_members)
 {
-  //Implement crossover, them mutation
+  //Implement crossover, then mutation
   int members_to_create = pop_size - (pop_size * elite_pct);// - (pop_size * mutation_pct);
-  int par1, par2;
-  double tot_gen_fitness = 0;
-  vector <double> member_fit_pct;
+  int parent1, parent2;
   double cache = 0.0;
   double fit;
+  double tot_gen_fitness = 0;
+  vector <double> member_fit_pct;
+  vector <Plant*> new_member;
   //Sum the total generations fitness
   for(int i = 0; i < pop_size; i++)
     tot_gen_fitness += fitness[cur_gen * pop_size + i];
@@ -192,31 +205,28 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
   //Print out
   for(int i = 0; i < member_fit_pct.size(); i++)
      cout << "fit pct @" << i << " = " << member_fit_pct[i] << endl;
-  /*
-  int plant_indx = 0;
-  vector <Plant*> plant_builder;
-  //Block to push on Plant* for chromos
+  
+  //For all missing members of population, apply roulette wheel selection
   for(int i = 0; i < members_to_create; i++)
   {
-	//Use roulette wheel selection  
-	//Select both parents
-	//Select cross over point in X
-	  //From 0->cross point, parent X's genes
-	  //Rest is parent Y's
-	//Push new member into population 
-	plant_builder.clear();	
-	plant_indx = i;
-	for(int j = 0; j < calendar_days; j++)
-	{
-	  plant_builder.push_back(ret_rand_plant());
-	}
-	chromos.push_back(plant_builder);	
-  }
-  */
-  parent1 = roulette_selection(member_fit_pct);
-  parent2 = roulette_selection(member_fit_pct);
-}
+    //Select both parents
+    parent1 = roulette_selection(member_fit_pct);
+    parent2 = roulette_selection(member_fit_pct);
+    //Start with parent Y's genes
+    new_member = chromos[cur_gen * pop_size + parent2];   
+    //From 0->cross point, parent X's genes
+    for(int j = 0; j < get_cross_point(); j++)
+      new_member[j] = chromos[pop_size* cur_gen + parent1][j];	
+    //Push new member into population 
+    chromos.push_back(new_member); 
+  } 
 
+}
+int Ga::get_cross_point()
+{
+  init_randoms();
+  return rand() % calendar_days;
+}
 int Ga::roulette_selection(vector<double> fit_pct)
 {
   init_randoms();
@@ -247,7 +257,7 @@ int Ga::chrom_fitness(int chrom_index)
     sun_sum = 0;
     rain_sum = 0;
     //Loop through grow cycle, sum rain amount and sunny days
-    for(int j = i; j < chromos[chrom_index][i]->ret_grow_period(); j++)
+    for(int j = i; j < chromos[cur_gen * chrom_index][i]->ret_grow_period(); j++)
     {
       if (calendar[j] == 0)
 	sun_sum += 1;
@@ -255,7 +265,7 @@ int Ga::chrom_fitness(int chrom_index)
 	rain_sum += calendar[j];
     } 
     //If the grow period met plants requirements, increment fitness of this chromosone
-    if (rain_sum >= chromos[chrom_index][i]->ret_rain_amt() && sun_sum >=  chromos[chrom_index][i]->ret_sun_days() )
+    if (rain_sum >= chromos[cur_gen * chrom_index][i]->ret_rain_amt() && sun_sum >=  chromos[cur_gen * chrom_index][i]->ret_sun_days() )
       fitness += 1; 
   }   
   return fitness;
