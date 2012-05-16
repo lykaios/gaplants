@@ -300,17 +300,12 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
   //Calculate the pct of each members fitness
   for(int i = 0; i < pop_size; i++)
   {
-    //TODO: Make this one statement
     fit = fitness[cur_gen*pop_size+ i];
     cache = fit / tot_gen_fitness;
     member_fit_pct.push_back(cache); 
   }
-  //Print out
-  //for(int i = 0; i < member_fit_pct.size(); i++)
-  //   cout << "fit pct @" << i << " = " << member_fit_pct[i] << endl;
-  //cout << "DEBUG: members needed to breed = " << members_to_create << endl;  
-  //For all missing members of population, apply roulette wheel selection
   
+  //For all missing members of population, apply roulette wheel selection
   for(int i = 0; i < members_to_create; i++)
   {
     //Select both parents
@@ -327,24 +322,25 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
   
 }
 
-//Get random number to be crossover point
+//
 /**********************************************************
-Name: 
-Parameters:
-Purpose: 
-Returns: 
+Name: get_cross_point 
+Parameters: none
+Purpose: Get random number to be crossover point 
+Returns: random int between 0 and number of calendar days 
 **********************************************************/
 int Ga::get_cross_point()
 {
   return rand() % calendar_days;
 }
 
-//Apply roulette_selection
+//
 /**********************************************************
-Name: 
+Name: roulette_selection 
 Parameters:
-Purpose: 
-Returns: 
+  fit_pct - a vector of the current generations chance to be selected
+Purpose:Apply roulette_selection 
+Returns: int value representing the parent 
 **********************************************************/
 int Ga::roulette_selection(vector<double> fit_pct)
 {
@@ -364,6 +360,7 @@ int Ga::roulette_selection(vector<double> fit_pct)
   }
   return i; 
 }
+
 /**********************************************************
 Name: 
 Parameters:
