@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
 {
   
   srand(time(NULL));
+  srand48(time(NULL));
   //Expects number of threads, run number, name of logfile, name of plant list to be passed.
   if(argc < 4)
   {
@@ -66,7 +67,7 @@ int main(int argc, char *argv[])
   //Print out fitness, should be increasing over time
   my_ga->print_fitness();
   //my_ga->print(); 
-  //Print time and call verification step
+  //Print time out to file
   //fout << "Time elapsed: " << difftime(end, begin) << " seconds where n = " << msize;
   //Close file
   fout.close();

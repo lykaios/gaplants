@@ -11,14 +11,12 @@ using namespace std;
 
 Ga::Ga(vector<Plant*> plants_in)
 {
-  pop_size = 30;
-  //TODO: Only for dev, increase day size for real tests
-  //12 months, 30 days
-  calendar_days = 360;
+  pop_size = 100;
+  //Artifically increased to increase problem size (timing)
+  calendar_days = 8000;
   cur_gen = 0;
-  cross_rate = .2;
   elite_pct = .2;
-  //mutation_pct = .1;
+  mutate_pct = .05;
   init_calendar(); 
   plant_list = plants_in;
   init_chromos();
@@ -49,10 +47,12 @@ void Ga::init_chromos()
 //Reinit pseudo random values because time-based won't work for rapid calls due to caching
 void Ga::init_randoms()
 {
+  /*
   int i1,i2;
   i1 = rand() % 112312;
   i2 = rand() % 912312;
   srand48(i1 % i2);
+  */
 }
 //Print out current class info
 void Ga::print()
@@ -102,7 +102,7 @@ void Ga::print_fitness()
       tot_gen_fit = 0;
       max_fit = 0;
     }
-    cout << fitness[i] << "|";
+    //cout << fitness[i] << "|";
   }
 }
 
@@ -187,12 +187,32 @@ void Ga::advance_generation()
   //Breed members
   breed_population(fit_members);
   
-  //Mutate remaining?
-
   //Advance generation counter
   cur_gen++;
+  
+  //Mutate remaining 
+  for(int h = 0; h < pop_size; h++)
+  {  
+    push_member = chromos[cur_gen * pop_size + h];
+    //mutate_chromo(chromos[cur_gen * pop_size + h]);
+    mutate_chromo(push_member);
+    chromos[cur_gen * pop_size + h] = push_member;
+  }
 }
 
+void Ga::mutate_chromo(vector<Plant *> &chromo)
+{
+  init_randoms();
+  double rand_select; 
+  //For every day, check for mutation
+  for(int i = 0; i < chromo.size(); i++)
+  {
+      rand_select = drand48();
+      //If it is within pct chance, randomly select new plant for that day
+      if(rand_select < mutate_pct)
+	chromo[i] = ret_rand_plant(); 
+  }
+}
 //Function used to insert into our elite member list
 void Ga::insert_elite(vector<pair <int,int> > &fit_members, int fitness, int member_index, int target_index)
 {

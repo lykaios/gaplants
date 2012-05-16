@@ -18,12 +18,13 @@ class Ga
   private:
 	void init_calendar();
 	void init_chromos();	
+	void init_randoms();
 	Plant *ret_rand_plant();
 	int chrom_fitness(int chrom_index);
 	void insert_elite(vector<pair <int,int> > &fit_members, int fitness, int member_index, int target_index);
 	void breed_population(vector<pair <int,int> > fit_members);
 	int roulette_selection(vector<double> fit_pct);
-	void init_randoms();
+	void mutate_chromo(vector<Plant *> &chromo);
 	int get_cross_point();
 
 	//Store "farms" as a vector of plant pointers
@@ -36,10 +37,10 @@ class Ga
 	int calendar_days;
 	//Size of GA population 
 	int pop_size;
-	//Crossover rate
-	double cross_rate;
 	//Percentage of population to be "elite"
 	double elite_pct; 
+	//Mutation rate
+	double mutate_pct;	
 	//Fitness of each chromosome, each generation
 	vector<int> fitness;
 	//Current generation we are on. This way we can reference prior generations fitness
