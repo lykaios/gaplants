@@ -1,7 +1,7 @@
 using namespace std;
 #include "plant.h"
 /*
-  This class is used to simulate a genetic algorithm
+  This class is used to hold all the variables necessary to initialize, and simulate a genetic algorithm
 */
 
 #ifndef GA_H
@@ -18,7 +18,6 @@ class Ga
   private:
 	void init_calendar();
 	void init_chromos();	
-	void init_randoms();
 	Plant *ret_rand_plant();
 	int chrom_fitness(int chrom_index);
 	void insert_elite(vector<pair <int,int> > &fit_members, int fitness, int member_index, int target_index);

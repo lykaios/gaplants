@@ -1,6 +1,6 @@
 using namespace std;
 /*
-This class is used to store a system of linear equations in the Ax=b fashion. 
+This class is used to hold our "plants" for the growing season.
 */
 #ifndef PLANT_H
 #define PLANT_H
