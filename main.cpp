@@ -36,15 +36,14 @@ int main(int argc, char *argv[])
   int in_rain,in_sun,in_grow;
   vector<Plant*> plant_list;
   time_t begin, end; 
-  /* 
   int thread_num = atoi(argv[1]);
+  
   //Set and print OpenMP information
   omp_set_num_threads(thread_num); 
   fout << "=====New Run=====\n";
   fout << ":Number of cores = " << omp_get_num_procs() << endl;
-  fout << ":Thread number = " << omp_get_num_threads() << endl;
   fout << ":Max thread number = " << omp_get_max_threads() << endl;
-  */
+  
   //Read in our list of plants
   while(plant_file) 
   {

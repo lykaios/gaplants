@@ -3,7 +3,7 @@ out='output'
 plants='plants.txt'
 logfile='timelog'
 main='gafarm'
-threads=1
+threads=2
 #delete old executable
 rm $main $out
 #compile program

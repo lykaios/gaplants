@@ -197,6 +197,7 @@ void Ga::eval_fitness()
 {
   int local_fitness = 0;
   //For each chromosone
+  #pragma omp for
   for(int i = 0; i < pop_size; i++)
   {
     local_fitness = chrom_fitness(i);
@@ -256,6 +257,7 @@ void Ga::advance_generation()
   cur_gen++;
   
   //Mutate remaining 
+  #pragma omp for
   for(int h = 0; h < pop_size; h++)
   {  
     push_member = chromos[cur_gen * pop_size + h];
@@ -277,6 +279,7 @@ void Ga::mutate_chromo(vector<Plant *> &chromo)
 {
   double rand_select; 
   //For every day, check for mutation
+  #pragma omp for
   for(int i = 0; i < chromo.size(); i++)
   {
       rand_select = drand48();
@@ -321,8 +324,7 @@ Returns:
 **********************************************************/
 void Ga::breed_population(vector<pair <int,int> > fit_members)
 {
-  //Implement crossover, then mutation
-  int members_to_create = pop_size - (pop_size * elite_pct);// - (pop_size * mutation_pct);
+  int members_to_create = pop_size - (pop_size * elite_pct);
   int parent1, parent2;
   double cache = 0.0;
   double fit;
@@ -341,6 +343,7 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
   }
   
   //For all missing members of population, apply roulette wheel selection
+  #pragma omp for
   for(int i = 0; i < members_to_create; i++)
   {
     //Select both parents
@@ -409,16 +412,18 @@ Returns:
 **********************************************************/
 int Ga::chrom_fitness(int chrom_index)
 {
-  int sun_sum, rain_sum;
+  int sun_sum, rain_sum, i, j;
   int fitness = 0;
   //For each day chopping off last 50 days for simplicity for now
-  //TODO: Fix so that it gets lowest grow period from plant list
-  for(int i = 0; i < calendar_days - 50; i++)
+  //#pragma omp parallel default(none) shared(i, j, fitness, chrom_index) private(sun_sum, rain_sum) 
+  //{ 
+  //#pragma omp for  
+  for(i = 0; i < calendar_days - 40; i++)
   {
     sun_sum = 0;
     rain_sum = 0;
     //Loop through grow cycle, sum rain amount and sunny days
-    for(int j = i; j < chromos[cur_gen * pop_size + chrom_index][i]->ret_grow_period(); j++)
+    for(j = i; j < chromos[cur_gen * pop_size + chrom_index][i]->ret_grow_period(); j++)
     {
       if (calendar[j] == 0)
 	sun_sum += 1;
@@ -429,5 +434,6 @@ int Ga::chrom_fitness(int chrom_index)
     if (rain_sum >= chromos[cur_gen * pop_size + chrom_index][i]->ret_rain_amt() && sun_sum >=  chromos[cur_gen * pop_size + chrom_index][i]->ret_sun_days() )
       fitness += 1; 
   }   
+  //}
   return fitness;
 }
