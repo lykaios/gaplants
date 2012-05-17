@@ -42,8 +42,12 @@ Returns:
 **********************************************************/
 void Ga::init_calendar()
 {
-  for(int i = 0; i < calendar_days; i++)
-	calendar.push_back(rand() % 4); 
+  #pragma omp parallel default(none)  
+  {
+    #pragma omp for
+    for(int i = 0; i < calendar_days; i++)
+	  calendar.push_back(rand() % 4);
+  } 
 }
 
 /**********************************************************
@@ -58,15 +62,20 @@ Returns:
 void Ga::init_chromos()
 {
   int plant_indx = 0;
+  int j;
   vector <Plant*> plant_builder;
   for(int i = 0; i < pop_size; i++)
   {
 	plant_builder.clear();	
 	plant_indx = i;
-	for(int j = 0; j < calendar_days; j++)
-	{
-	  plant_builder.push_back(ret_rand_plant());
-	}
+	//#pragma omp parallel default(none)  shared(i, j, plant_builder)
+	//{
+	//  #pragma omp for
+	  for(j = 0; j < calendar_days; j++)
+	  {
+	    plant_builder.push_back(ret_rand_plant());
+	  }
+      	//}
 	chromos.push_back(plant_builder);	
   }
 }
@@ -124,6 +133,7 @@ void Ga::print_fitness()
 {
   int tot_gen_fit = 0;
   int max_fit = 0;
+  int genmax_fit, gen0_fit;
   int row_size = 30;
   for(int i = 0; i < fitness.size(); i++)
   {
@@ -195,13 +205,16 @@ Returns:
 **********************************************************/
 void Ga::eval_fitness()
 {
-  int local_fitness = 0;
+    for(int c = 0; c < pop_size; c++)
+      fitness.push_back(0);
   //For each chromosone
-  #pragma omp for
-  for(int i = 0; i < pop_size; i++)
+  #pragma omp parallel default(none)
   {
-    local_fitness = chrom_fitness(i);
-    fitness.push_back(local_fitness);   
+    #pragma omp for
+    for(int i = 0; i < pop_size; i++)
+    { 
+      fitness[cur_gen* pop_size + i] = chrom_fitness(i);   
+    }
   } 
 }
 
@@ -257,12 +270,15 @@ void Ga::advance_generation()
   cur_gen++;
   
   //Mutate remaining 
-  #pragma omp for
-  for(int h = 0; h < pop_size; h++)
-  {  
-    push_member = chromos[cur_gen * pop_size + h];
-    mutate_chromo(push_member);
-    chromos[cur_gen * pop_size + h] = push_member;
+  #pragma omp parallel default(none) private(push_member)
+  {
+    #pragma omp for
+    for(int h = 0; h < pop_size; h++)
+    {  
+      push_member = chromos[cur_gen * pop_size + h];
+      mutate_chromo(push_member);
+      chromos[cur_gen * pop_size + h] = push_member;
+    }
   }
 }
 
@@ -279,13 +295,16 @@ void Ga::mutate_chromo(vector<Plant *> &chromo)
 {
   double rand_select; 
   //For every day, check for mutation
-  #pragma omp for
-  for(int i = 0; i < chromo.size(); i++)
+  #pragma omp parallel default(none) shared(chromo) private(rand_select)
   {
-      rand_select = drand48();
-      //If it is within pct chance, randomly select new plant for that day
-      if(rand_select < mutate_pct)
-	chromo[i] = ret_rand_plant(); 
+    #pragma omp for
+    for(int i = 0; i < chromo.size(); i++)
+    {
+	rand_select = drand48();
+	//If it is within pct chance, randomly select new plant for that day
+	if(rand_select < mutate_pct)
+	  chromo[i] = ret_rand_plant(); 
+    }
   }
 }
 //
@@ -343,7 +362,6 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
   }
   
   //For all missing members of population, apply roulette wheel selection
-  #pragma omp for
   for(int i = 0; i < members_to_create; i++)
   {
     //Select both parents
@@ -415,9 +433,6 @@ int Ga::chrom_fitness(int chrom_index)
   int sun_sum, rain_sum, i, j;
   int fitness = 0;
   //For each day chopping off last 50 days for simplicity for now
-  //#pragma omp parallel default(none) shared(i, j, fitness, chrom_index) private(sun_sum, rain_sum) 
-  //{ 
-  //#pragma omp for  
   for(i = 0; i < calendar_days - 40; i++)
   {
     sun_sum = 0;
@@ -434,6 +449,5 @@ int Ga::chrom_fitness(int chrom_index)
     if (rain_sum >= chromos[cur_gen * pop_size + chrom_index][i]->ret_rain_amt() && sun_sum >=  chromos[cur_gen * pop_size + chrom_index][i]->ret_sun_days() )
       fitness += 1; 
   }   
-  //}
   return fitness;
 }
