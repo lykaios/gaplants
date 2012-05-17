@@ -19,7 +19,7 @@ Ga::Ga(vector<Plant*> plants_in)
 {
   pop_size = 100;
   //Artifically increased to increase problem size (timing)
-  calendar_days = 1000;
+  calendar_days = 40000;
   cur_gen = 0;
   elite_pct = .2;
   mutate_pct = .05;
