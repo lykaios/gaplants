@@ -42,6 +42,8 @@ class Ga
 	double mutate_pct;	
 	//Fitness of each chromosome, each generation
 	vector<int> fitness;
+	int gen0_fit;
+	int genmax_fit;
 	//Current generation we are on. This way we can reference prior generations fitness
 	int cur_gen;
 };

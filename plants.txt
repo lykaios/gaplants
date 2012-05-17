@@ -8,3 +8,8 @@ Brocolli 30 4 1
 Potatoe 30 10 10
 Mushrooms 23 6 4
 Asparagus 55 6 6
+Bellpepper 21 10 4
+Almond 55 20 6
+Walnut 50 14 7
+Apricot 44 14 7
+Ginger 12 11 5

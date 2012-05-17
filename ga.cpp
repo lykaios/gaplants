@@ -11,9 +11,12 @@ using namespace std;
 
 /**********************************************************
 Name:Ga() 
-Parameters:plants_in - list of plants to use for simulation
-Purpose: initialize the variables of the genetic algorithm
-Returns: nothing, constructor
+Parameters:
+  plants_in - list of plants to use for simulation
+Purpose: 
+  Initialize the variables of the genetic algorithm
+Returns: 
+  Nothing, constructor
 **********************************************************/
 Ga::Ga(vector<Plant*> plants_in)
 {
@@ -22,17 +25,20 @@ Ga::Ga(vector<Plant*> plants_in)
   calendar_days = 40000;
   cur_gen = 0;
   elite_pct = .2;
-  mutate_pct = .05;
+  mutate_pct = .02;
   init_calendar(); 
   plant_list = plants_in;
   init_chromos();
 }
 
 /**********************************************************
-Name: init_calendar() 
-Parameters: none
-Purpose: Fill our calendar with integer values, representing amount of rain
-Returns: none, but updates the class calendar 
+Name: init_calendar 
+Parameters: 
+  none
+Purpose: 
+  Fill our calendar with integer values, representing amount of rain
+Returns: 
+  Nothing, but updates the class calendar 
 **********************************************************/
 void Ga::init_calendar()
 {
@@ -41,10 +47,13 @@ void Ga::init_calendar()
 }
 
 /**********************************************************
-Name: init_chromos() 
-Parameters: none
-Purpose: Fill each member of population with randomly selected plant growing days.
-Returns: nothing, but updates our chromosome population 
+Name: init_chromos 
+Parameters: 
+  none
+Purpose: 
+  Fill each member of population with randomly selected plant growing days.
+Returns: 
+  Nothing, but updates our chromosome population 
 **********************************************************/
 void Ga::init_chromos()
 {
@@ -63,10 +72,13 @@ void Ga::init_chromos()
 }
 
 /**********************************************************
-Name: print() 
-Parameters: none 
-Purpose: Print out current class info
-Returns: nothing 
+Name: print 
+Parameters: 
+  none 
+Purpose: 
+  Print out current class info
+Returns: 
+  nothing 
 **********************************************************/
 void Ga::print()
 {
@@ -98,12 +110,15 @@ void Ga::print()
     }
   };
 }
-//
+
 /**********************************************************
 Name: print_fitness() 
-Parameters: none
-Purpose: Print out fitness for each generation
-Returns: nothing 
+Parameters: 
+  none
+Purpose: 
+  Print out fitness for each generation
+Returns: 
+  nothing 
 **********************************************************/
 void Ga::print_fitness()
 {
@@ -119,9 +134,12 @@ void Ga::print_fitness()
     if(i % pop_size == 0 && i != 0)
     { 
       cout << "gen" << i / pop_size << "|Total Gen Fit = " << tot_gen_fit << ", Max fit = " << max_fit << endl;
+      genmax_fit = max_fit;
       tot_gen_fit = 0;
       max_fit = 0;
     }
+    if(i == 0)
+      gen0_fit = max_fit;
     /*if(i % row_size == 0 && i != 0)
       cout << endl;
     else
@@ -132,9 +150,12 @@ void Ga::print_fitness()
 
 /**********************************************************
 Name: print_chromosome 
-Parameters: chrom_to_print - a single chrmosome, row_size - used purely for print formatting
-Purpose: Print a single chromosome 
-Returns: nothing 
+Parameters: 
+  chrom_to_print - a single chrmosome, row_size - used purely for print formatting
+Purpose: 
+  Print a single chromosome 
+Returns: 
+  nothing 
 **********************************************************/
 void Ga::print_chromosome(vector<Plant *> chromo_to_print, int row_size)
 {
@@ -149,9 +170,12 @@ void Ga::print_chromosome(vector<Plant *> chromo_to_print, int row_size)
 
 /**********************************************************
 Name: ret_rand_plant 
-Parameters: none
-Purpose: Fetch a random plant pointer from our list. 
-Returns: Plant *  
+Parameters: 
+  none
+Purpose: 
+  Fetch a random plant pointer from our list. 
+Returns: 
+  Plant *  
 **********************************************************/
 Plant * Ga::ret_rand_plant()
 {
@@ -162,9 +186,12 @@ Plant * Ga::ret_rand_plant()
 
 /**********************************************************
 Name: eval_fitness 
-Parameters: none
-Purpose: Evaluate fitness of population for current generation
-Returns: nothing, but updates our class fitness variable 
+Parameters: 
+  none
+Purpose: 
+  Evaluate fitness of population for current generation
+Returns: 
+  Nothing, but updates our class fitness variable 
 **********************************************************/
 void Ga::eval_fitness()
 {
@@ -179,12 +206,14 @@ void Ga::eval_fitness()
 
 /**********************************************************
 Name: advance_generation 
-Parameters: none
+Parameters: 
+  none
 Purpose: Used to advance onto next generation
   :selects the elite members
   :crosses their genes to produce new population
   :runs mutation on each chromosome
-Returns: nothing, but updates most class variables
+Returns: 
+  nothing, but updates most class variables
 **********************************************************/
 void Ga::advance_generation()
 {
@@ -237,9 +266,12 @@ void Ga::advance_generation()
 
 /**********************************************************
 Name: mutate_chromo 
-Parameters: chromo - Plant * vector to perform mutation on
-Purpose: To loop through each day, and see if that gene should be mutated. 
-Returns: passing back by reference, the updated chromosome. 
+Parameters: 
+  chromo - Plant * vector to perform mutation on
+Purpose: 
+  To loop through each day, and see if that gene should be mutated. 
+Returns: 
+  Passing back by reference, the updated chromosome. 
 **********************************************************/
 void Ga::mutate_chromo(vector<Plant *> &chromo)
 {
@@ -279,10 +311,13 @@ void Ga::insert_elite(vector<pair <int,int> > &fit_members, int fitness, int mem
 }
 
 /**********************************************************
-Name: 
+Name:breed_population 
 Parameters:
+  fit_members - a vector of pairs which holds the fittest members of a population
 Purpose: 
-Returns: 
+  Produce the next generation of chromosomes via "breeding" (crossover) 
+Returns:
+  Nothing, but updates the chromosome class variable 
 **********************************************************/
 void Ga::breed_population(vector<pair <int,int> > fit_members)
 {
@@ -322,25 +357,27 @@ void Ga::breed_population(vector<pair <int,int> > fit_members)
   
 }
 
-//
 /**********************************************************
 Name: get_cross_point 
 Parameters: none
-Purpose: Get random number to be crossover point 
-Returns: random int between 0 and number of calendar days 
+Purpose: 
+  Get random number to be crossover point 
+Returns: 
+  random int between 0 and number of calendar days 
 **********************************************************/
 int Ga::get_cross_point()
 {
   return rand() % calendar_days;
 }
 
-//
 /**********************************************************
 Name: roulette_selection 
 Parameters:
   fit_pct - a vector of the current generations chance to be selected
-Purpose:Apply roulette_selection 
-Returns: int value representing the parent 
+Purpose:
+  Apply roulette_selection 
+Returns: 
+  int value representing the parent 
 **********************************************************/
 int Ga::roulette_selection(vector<double> fit_pct)
 {
@@ -362,10 +399,13 @@ int Ga::roulette_selection(vector<double> fit_pct)
 }
 
 /**********************************************************
-Name: 
+Name: chrom_fitness 
 Parameters:
-Purpose: 
-Returns: 
+  chrom_index - index in chromosome vector
+Purpose:
+  Evalute the fitness of a specific chromosome 
+Returns:
+  Fitness of a given chromosome  
 **********************************************************/
 int Ga::chrom_fitness(int chrom_index)
 {

@@ -9,9 +9,5 @@ rm $main $out
 #compile program
 g++ -fopenmp -o $main main.cpp plant.cpp ga.cpp 
 #execute program, pipe output
-for i in {1..1}
-do
-./$main $threads $i $logfile $plants  > $out 
-done
-
+./$main $threads $plants $logfile > $out 
 more output

@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
   ofstream fout;
   ifstream plant_file;
   fout.open(argv[3], ios::app);    
-  plant_file.open(argv[4]);
+  plant_file.open(argv[2]);
   string in_name;
   int in_rain,in_sun,in_grow;
   vector<Plant*> plant_list;
@@ -40,13 +40,12 @@ int main(int argc, char *argv[])
   int thread_num = atoi(argv[1]);
   //Set and print OpenMP information
   omp_set_num_threads(thread_num); 
-  fout << "=====Run (" << argv[3] <<")=====\n";
+  fout << "=====New Run=====\n";
   fout << ":Number of cores = " << omp_get_num_procs() << endl;
   fout << ":Thread number = " << omp_get_num_threads() << endl;
   fout << ":Max thread number = " << omp_get_max_threads() << endl;
   */
-  //Initialize our calendar
-  //represent as vector of ints
+  //Read in our list of plants
   while(plant_file) 
   {
 	plant_file >> in_name;
@@ -59,14 +58,13 @@ int main(int argc, char *argv[])
   Ga * my_ga = new Ga(plant_list); 
   //my_ga->print();
   //Simulate for x generations
-  for(int x = 0; x < 100; x++)
+  for(int x = 0; x < 150; x++)
   {
     my_ga->advance_generation();
   }
   time(&end);
-  //Print out fitness, should be increasing over time
+  //Print out fitness, used to verify fitness increases over time. 
   my_ga->print_fitness();
-  //my_ga->print(); 
   //Print time out to file
   fout << "Time elapsed: " << difftime(end, begin) << " seconds \n";
   //Close file
